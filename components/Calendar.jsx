@@ -38,6 +38,7 @@ export default function Calendar() {
   const [viewDate, setViewDate] = useState(new Date())
   const [rangeStart, setRangeStart] = useState(null)
   const [rangeEnd, setRangeEnd] = useState(null)
+  const [animating, setAnimating] = useState(false)
 
   const { notes, addNote, deleteNote, clearNotes } = useNotes()
 
@@ -47,26 +48,33 @@ export default function Calendar() {
   const daysCount = getDaysInMonth(currentYear, currentMonth)
   const emptyBoxes = getFirstDayOfMonth(currentYear, currentMonth)
 
-  // Auto-dark mode if it's evening
+  // Auto-dark mode based on system time 
   const hour = new Date().getHours()
   const darkTheme = hour > 18 || hour < 6
 
-  // Prepare the day list for the grid
+  // Prepare the day list for the rendering grid
   let calendarDays = []
   for (let i = 0; i < emptyBoxes; i++) calendarDays.push(null)
   for (let i = 1; i <= daysCount; i++) calendarDays.push(i)
 
-  const movePrev = () => {
-    const d = new Date(viewDate)
-    d.setMonth(d.getMonth() - 1)
-    setViewDate(d)
+  const changeMonth = (offset) => {
+    if (animating) return
+    setAnimating(true)
+
+    // Mid-transition swap (ensures the data change is masked by the animation)
+    setTimeout(() => {
+      const d = new Date(viewDate)
+      d.setMonth(d.getMonth() + offset)
+      setViewDate(d)
+      
+      setTimeout(() => {
+        setAnimating(false)
+      }, 150)
+    }, 150)
   }
 
-  const moveNext = () => {
-    const d = new Date(viewDate)
-    d.setMonth(d.getMonth() + 1)
-    setViewDate(d)
-  }
+  const movePrev = () => changeMonth(-1)
+  const moveNext = () => changeMonth(1)
 
   const selectDate = (dayNum) => {
     if (!dayNum) return
@@ -128,7 +136,12 @@ export default function Calendar() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"/>
       </div>
 
-      <div className="p-3 sm:p-5 lg:p-6 flex-1 min-w-0 flex flex-col">
+      <div className={`p-3 sm:p-5 lg:p-6 flex-1 min-w-0 flex flex-col relative transition-all duration-300 ease-in-out ${animating ? 'opacity-30 scale-95 blur-sm pointer-events-none' : 'opacity-100 scale-100 blur-0'}`}>
+        
+        {/* Subtle internal loading overlay */}
+        {animating && (
+          <div className="absolute inset-0 z-10 bg-black/5 dark:bg-white/5 backdrop-blur-[1px] rounded-xl"/>
+        )}
 
         <CalendarHeader currentDate={viewDate} onPrev={movePrev} onNext={moveNext} />
 
