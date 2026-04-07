@@ -41,20 +41,34 @@ export default function NotesPanel({ rangeStart, rangeEnd, notes, onAddNote, onD
         {notes.length === 0 ? (
           <p className="text-xs text-gray-400 italic">No notes for this month.</p>
         ) : (
-          notes.map(note => (
-            <li 
-              key={note.id} 
-              className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm"
-            >
-              <span className="break-all text-sm text-white/90">{note.text}</span>
-              <button 
-                onClick={() => onDeleteNote(note.id)} 
-                className="text-gray-500 hover:text-red-400 transition text-sm px-1.5"
+          notes.map(note => {
+            const s = new Date(note.start)
+            const e = new Date(note.end)
+            const isRange = s.getTime() !== e.getTime()
+            const dateStr = isRange 
+              ? `${s.getDate()} - ${e.getDate()} ${s.toLocaleDateString(undefined, { month: 'short' })}`
+              : `${s.getDate()} ${s.toLocaleDateString(undefined, { month: 'short' })}`
+
+            return (
+              <li 
+                key={note.id} 
+                className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm"
               >
-                ✕
-              </button>
-            </li>
-          ))
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] text-blue-400 font-bold uppercase tracking-wide">
+                    {dateStr}
+                  </span>
+                  <span className="break-all text-sm text-white/90">{note.text}</span>
+                </div>
+                <button 
+                  onClick={() => onDeleteNote(note.id)} 
+                  className="text-gray-500 hover:text-red-400 transition text-sm px-1.5"
+                >
+                  ✕
+                </button>
+              </li>
+            )
+          })
         )}
       </ul>
 
