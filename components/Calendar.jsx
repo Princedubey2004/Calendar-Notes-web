@@ -149,13 +149,13 @@ export default function Calendar() {
         <div className="flex justify-between mb-3">
           <button 
             onClick={() => setViewDate(new Date())} 
-            className="px-3 py-1 text-xs bg-gray-700 text-white rounded-md hover:bg-gray-600 transition"
+            className="px-3 py-1 text-xs bg-gray-700 text-white rounded-md hover:bg-gray-600 active:scale-95 transition-all duration-200"
           >
             Today
           </button>
           <button 
             onClick={wipeMonthData} 
-            className="px-3 py-1 text-xs bg-gray-700 text-white rounded-md hover:bg-gray-600 transition"
+            className="px-3 py-1 text-xs bg-gray-700 text-white rounded-md hover:bg-gray-600 active:scale-95 transition-all duration-200"
           >
             Clear Month
           </button>

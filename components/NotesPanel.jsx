@@ -52,17 +52,19 @@ export default function NotesPanel({ rangeStart, rangeEnd, notes, onAddNote, onD
             return (
               <li 
                 key={note.id} 
-                className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm"
+                className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm transition-all duration-300 hover:border-blue-500/30 group/note animate-in slide-in-from-top-2 fade-in"
               >
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] text-blue-400 font-bold uppercase tracking-wide">
+                  <span className="text-[10px] text-blue-400 font-bold uppercase tracking-wide opacity-80 group-hover/note:opacity-100 transition-opacity">
                     {dateStr}
                   </span>
-                  <span className="break-all text-sm text-white/90">{note.text}</span>
+                  <span className="break-all text-sm text-white/90 leading-relaxed font-medium">
+                    {note.text}
+                  </span>
                 </div>
                 <button 
                   onClick={() => onDeleteNote(note.id)} 
-                  className="text-gray-500 hover:text-red-400 transition text-sm px-1.5"
+                  className="text-gray-500 hover:text-red-400 transition-colors duration-200 text-sm px-1.5 active:scale-90"
                 >
                   ✕
                 </button>

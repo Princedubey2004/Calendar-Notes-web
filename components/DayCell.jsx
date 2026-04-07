@@ -9,14 +9,14 @@ export default function DayCell({ day, selection, onClick, holiday, today }) {
   }
 
   // Combine classes based on state
-  let boxClasses = "aspect-square flex items-center justify-center text-xs sm:text-sm rounded cursor-pointer relative group transition"
+  let boxClasses = "aspect-square flex items-center justify-center text-xs sm:text-sm rounded cursor-pointer relative group transition-all duration-200 hover:scale-110 active:scale-90 z-0 hover:z-10"
 
   if (selection) {
-    // Sheer glassy blue for active range
-    boxClasses += " bg-blue-500/15 ring-1 ring-blue-400 text-blue-700 dark:text-blue-300"
+    // Sheer glassy blue for active range with a soft blue glow
+    boxClasses += " bg-blue-500/20 ring-1 ring-blue-400 text-blue-700 dark:text-blue-300 shadow-[0_0_12px_rgba(96,165,250,0.4)]"
   } else {
-    // Subtle hover effect
-    boxClasses += " hover:bg-white/10 text-gray-600 dark:text-gray-300"
+    // Subtle hover highlight
+    boxClasses += " hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"
   }
 
   return (
@@ -24,9 +24,9 @@ export default function DayCell({ day, selection, onClick, holiday, today }) {
       
       <span>{day}</span>
 
-      {/* Blue dot for the current real-world date */}
+      {/* Blue dot for today with a subtle pulse effect */}
       {today && (
-        <div className="absolute bottom-1 w-1 h-1 bg-blue-400 rounded-full" />
+        <div className="absolute bottom-1.5 w-1 h-1 bg-blue-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
       )}
 
       {/* Little dot if it's a designated holiday */}
