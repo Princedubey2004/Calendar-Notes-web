@@ -4,13 +4,13 @@ export default function CalendarHeader({ currentDate, onPrev, onNext }) {
   return (
     <div className="flex justify-between items-center mb-3">
       
-      <h2 className="text-lg font-semibold">
+      <h2 className="text-xl font-bold text-white drop-shadow-md">
         {currentDate.toLocaleString("default",{month:"long",year:"numeric"})}
       </h2>
 
-      <div className="flex gap-2 text-xs sm:text-sm">
-        <button onClick={onPrev} className="px-3 py-2 sm:px-2 sm:py-1 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">←</button>
-        <button onClick={onNext} className="px-3 py-2 sm:px-2 sm:py-1 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">→</button>
+      <div className="flex gap-2">
+        <button onClick={onPrev} className="p-2 sm:px-3 sm:py-2 bg-white/10 hover:bg-white/20 active:scale-90 border border-white/20 text-white rounded-lg transition-all duration-200">←</button>
+        <button onClick={onNext} className="p-2 sm:px-3 sm:py-2 bg-white/10 hover:bg-white/20 active:scale-90 border border-white/20 text-white rounded-lg transition-all duration-200">→</button>
       </div>
     </div>
   )

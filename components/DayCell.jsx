@@ -8,25 +8,25 @@ export default function DayCell({ day, selection, onClick, holiday, today }) {
     return <div className="aspect-square" />
   }
 
-  // Combine classes based on state
-  let boxClasses = "aspect-square flex items-center justify-center text-xs sm:text-sm rounded cursor-pointer relative group transition-all duration-200 hover:scale-110 active:scale-90 z-0 hover:z-10"
+  // Glassmorphism classes based on state
+  let boxClasses = "aspect-square flex items-center justify-center text-xs sm:text-sm rounded-lg cursor-pointer relative group transition-all duration-200 hover:scale-110 active:scale-90 z-0 hover:z-10 backdrop-blur-sm shadow-sm"
 
   if (selection) {
-    // Sheer glassy blue for active range with a soft blue glow
-    boxClasses += " bg-blue-500/20 ring-1 ring-blue-400 text-blue-700 dark:text-blue-300 shadow-[0_0_12px_rgba(96,165,250,0.4)]"
+    // High-visibility 'solid' glass highlight for selection
+    boxClasses += " bg-white/30 ring-2 ring-white/40 text-white shadow-[0_0_20px_rgba(255,255,255,0.3)]"
   } else {
-    // Subtle hover highlight
-    boxClasses += " hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"
+    // Subtle frosted glass for unselected cells
+    boxClasses += " bg-black/10 dark:bg-white/5 hover:bg-white/15 text-white font-medium drop-shadow-sm"
   }
 
   return (
     <div className={boxClasses} onClick={onClick}>
       
-      <span>{day}</span>
+      <span className="drop-shadow-md">{day}</span>
 
-      {/* Blue dot for today with a subtle pulse effect */}
+      {/* Blue dot today indicator with pulse and glow */}
       {today && (
-        <div className="absolute bottom-1.5 w-1 h-1 bg-blue-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
+        <div className="absolute bottom-1.5 w-1 h-1 bg-blue-300 rounded-full animate-pulse shadow-[0_0_10px_rgba(147,197,253,1)]" />
       )}
 
       {/* Little dot if it's a designated holiday */}

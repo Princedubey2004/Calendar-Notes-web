@@ -124,49 +124,51 @@ export default function Calendar() {
   const headerPic = monthPictures[currentMonth] || monthPictures[0]
 
   return (
-    <div className={`flex flex-col lg:flex-row rounded-xl overflow-hidden shadow-lg backdrop-blur-md transition-all duration-300 ${darkTheme ? 'bg-gray-900 text-white' : 'bg-white'}`}>
+    <div className="relative rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 min-h-[600px] flex flex-col">
 
-      {/* Picture Banner */}
-      <div className="h-44 relative lg:h-auto lg:w-1/3 xl:w-2/5 shrink-0 overflow-hidden">
+      {/* FULL BACKGROUND IMAGE CAROUSEL */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <img 
-          src={`${headerPic}?auto=format&fit=crop&w=800&q=80`} 
-          className="w-full h-full object-cover lg:absolute lg:inset-0 transition-transform duration-700 hover:scale-105" 
-          alt="nature"
+          src={`${headerPic}?auto=format&fit=crop&w=1200&q=80`} 
+          className="w-full h-full object-cover transition-transform duration-[3000ms] hover:scale-110 scale-105" 
+          alt="background"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"/>
+        {/* Multi-layer readability overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/30 to-black/60 backdrop-blur-[1px]"/>
       </div>
 
-      <div className={`p-3 sm:p-5 lg:p-6 flex-1 min-w-0 flex flex-col relative transition-all duration-300 ease-in-out ${animating ? 'opacity-30 scale-95 blur-sm pointer-events-none' : 'opacity-100 scale-100 blur-0'}`}>
+      {/* INTERACTIVE CONTENT LAYER */}
+      <div className={`relative z-10 p-4 sm:p-6 flex-1 flex flex-col transition-all duration-500 ease-in-out ${animating ? 'opacity-30 scale-98 blur-md pointer-events-none' : 'opacity-100 scale-100 blur-0'}`}>
         
-        {/* Subtle internal loading overlay */}
+        {/* Subtle switch overlay */}
         {animating && (
-          <div className="absolute inset-0 z-10 bg-black/5 dark:bg-white/5 backdrop-blur-[1px] rounded-xl"/>
+          <div className="absolute inset-0 z-20 bg-white/5 backdrop-blur-[2px] rounded-2xl"/>
         )}
 
         <CalendarHeader currentDate={viewDate} onPrev={movePrev} onNext={moveNext} />
 
-        {/* Buttons for navigation / clearing */}
-        <div className="flex justify-between mb-3">
+        {/* Floating Quick Actions */}
+        <div className="flex justify-between mb-4">
           <button 
             onClick={() => setViewDate(new Date())} 
-            className="px-3 py-1 text-xs bg-gray-700 text-white rounded-md hover:bg-gray-600 active:scale-95 transition-all duration-200"
+            className="px-4 py-1.5 text-xs bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-lg backdrop-blur-md transition-all font-medium"
           >
             Today
           </button>
           <button 
             onClick={wipeMonthData} 
-            className="px-3 py-1 text-xs bg-gray-700 text-white rounded-md hover:bg-gray-600 active:scale-95 transition-all duration-200"
+            className="px-4 py-1.5 text-xs bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-lg backdrop-blur-md transition-all font-medium"
           >
             Clear Month
           </button>
         </div>
 
-        {/* Week headings */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-xs mb-2 text-gray-400 font-medium">
-          {DAYS.map(dayName => <div key={dayName} className="text-center">{dayName}</div>)}
+        {/* Week Day Labels */}
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-[10px] sm:text-xs mb-3 text-white/60 font-bold uppercase tracking-widest text-center">
+          {DAYS.map(dayName => <div key={dayName} className="drop-shadow-sm">{dayName}</div>)}
         </div>
 
-        {/* The day cells */}
+        {/* The Glass Grid */}
         <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {calendarDays.map((day, idx) => (
             <DayCell
@@ -180,9 +182,9 @@ export default function Calendar() {
           ))}
         </div>
 
-        {/* Selection subtext */}
-        <div className="text-xs mt-3 text-gray-500 italic">
-          {rangeStart && `Plan: ${rangeStart.toDateString()} ${rangeEnd ? ' to '+rangeEnd.toDateString() : ''}`}
+        {/* Status Line */}
+        <div className="text-[10px] sm:text-xs mt-4 text-white/50 italic font-medium tracking-wide drop-shadow-sm">
+          {rangeStart && `Schedule: ${rangeStart.toLocaleDateString()} ${rangeEnd ? ' → '+rangeEnd.toLocaleDateString() : ''}`}
         </div>
 
         <NotesPanel
@@ -198,10 +200,10 @@ export default function Calendar() {
 
       </div>
 
-      {/* Behind the scenes image pre-loader */}
+      {/* Image Preloader */}
       <div className="hidden">
         {Object.values(monthPictures).map((src, idx) => (
-          <img key={idx} src={`${src}?auto=format&fit=crop&w=800&q=80`} alt="" fetchPriority="low" />
+          <img key={idx} src={`${src}?auto=format&fit=crop&w=1200&q=80`} alt="" />
         ))}
       </div>
     </div>
