@@ -38,5 +38,13 @@ export const useNotes = () => {
     })
   }
 
-  return { notes, addNote, deleteNote }
+  const clearNotes = (ids) => {
+    setNotes(prev => {
+      const updated = prev.filter(n => !ids.includes(n.id))
+      localStorage.setItem('calendar_notes', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  return { notes, addNote, deleteNote, clearNotes }
 }

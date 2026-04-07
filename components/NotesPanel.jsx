@@ -3,99 +3,59 @@
 import { useState } from 'react'
 
 export default function NotesPanel({ rangeStart, rangeEnd, notes, onAddNote, onDeleteNote }) {
-  const [text, setText] = useState('')
+  const [inputText, setInputText] = useState('')
 
-  const formatDate = (d) => {
-    if (!d) return ''
-    return d.toLocaleDateString()
-  }
-
-  const hasSel = !!rangeStart
-  const isRange = rangeStart && rangeEnd
-
-  let label = 'No date selected'
-
-  if (isRange) {
-    label = `${formatDate(rangeStart)} - ${formatDate(rangeEnd)}`
-  } else if (hasSel) {
-    label = formatDate(rangeStart)
-  }
-
-  const handleSubmit = (e) => {
+  const handlePostNote = (e) => {
     e.preventDefault()
-
-    if (!text.trim() || !hasSel) return
+    
+    // Validate we have text and a date context
+    if (!inputText.trim() || !rangeStart) return
 
     onAddNote({
-      text: text.trim(),
+      text: inputText,
       start: rangeStart.toISOString(),
       end: (rangeEnd || rangeStart).toISOString()
     })
 
-    setText('')
-  }
-
-  let list = []
-
-  if (hasSel) {
-    const s1 = rangeStart.getTime()
-    const e1 = (rangeEnd || rangeStart).getTime()
-
-    list = notes.filter(n => {
-      const s2 = new Date(n.start).getTime()
-      const e2 = new Date(n.end).getTime()
-
-      return Math.max(s1, s2) <= Math.min(e1, e2)
-    })
+    setInputText('')
   }
 
   return (
-    <div className="mt-4 pt-4 border-t">
+    <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-3 flex flex-col flex-1 min-h-0">
 
-      <h3 className="text-sm font-medium mb-3">
-        Notes ({label})
-      </h3>
+      {/* Entry form */}
+      <form onSubmit={handlePostNote} className="flex gap-2 mb-3 shrink-0">
+        <input
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          className="flex-1 bg-gray-800 border border-gray-700 text-white placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          placeholder="New note..."
+        />
+        <button className="bg-blue-500 hover:bg-blue-600 transition text-white px-3 py-1 text-sm rounded-lg font-medium">
+          Add
+        </button>
+      </form>
 
-      {hasSel ? (
-        <form onSubmit={handleSubmit} className="flex gap-2 mb-3">
-
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="add note..."
-            className="flex-1 border px-2 py-1 rounded text-sm"
-          />
-
-          <button className="bg-black text-white px-3 py-1 text-sm rounded">
-            Add
-          </button>
-
-        </form>
-      ) : (
-        <p className="text-sm text-gray-500 mb-3">
-          select a date first
-        </p>
-      )}
-
-      {hasSel && list.length === 0 && (
-        <p className="text-sm text-gray-400">no notes</p>
-      )}
-
-      <ul className="space-y-2 max-h-[150px] overflow-y-auto">
-        {list.map(n => (
-          <li key={n.id} className="border p-2 rounded text-sm flex justify-between">
-
-            <span>{n.text}</span>
-
-            <button
-              onClick={() => onDeleteNote(n.id)}
-              className="text-red-500"
+      {/* List of active month notes */}
+      <ul className="max-h-40 overflow-y-auto space-y-2 pr-1">
+        {notes.length === 0 ? (
+          <p className="text-xs text-gray-400 italic">No notes for this month.</p>
+        ) : (
+          notes.map(note => (
+            <li 
+              key={note.id} 
+              className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm"
             >
-              x
-            </button>
-
-          </li>
-        ))}
+              <span className="break-all text-sm text-white/90">{note.text}</span>
+              <button 
+                onClick={() => onDeleteNote(note.id)} 
+                className="text-gray-500 hover:text-red-400 transition text-sm px-1.5"
+              >
+                ✕
+              </button>
+            </li>
+          ))
+        )}
       </ul>
 
     </div>

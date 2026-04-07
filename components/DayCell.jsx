@@ -1,39 +1,46 @@
 'use client'
 
-import { isToday } from '@/utils/dateHelpers'
+// Individual box for each day in the month
+export default function DayCell({ day, selection, onClick, holiday, today }) {
+  
+  // Return empty div if it's just padding for start of month
+  if (!day) {
+    return <div className="aspect-square" />
+  }
 
-export default function DayCell({ day, month, year, selection, onClick }) {
-  if (!day) return <div className="aspect-square" />
+  // Combine classes based on state
+  let boxClasses = "aspect-square flex items-center justify-center text-xs sm:text-sm rounded cursor-pointer relative group transition"
 
-  const today = isToday(year, month, day)
-  const isStart = selection === 'start'
-  const isEnd = selection === 'end'
-  const inRange = selection === 'middle'
-  const isSelected = isStart || isEnd
-
-  let wrapClass = 'py-0.5 '
-  if (isStart && !isEnd) wrapClass += 'bg-blue-50/60 rounded-l-2xl pl-0.5'
-  if (isEnd && !isStart) wrapClass += 'bg-blue-50/60 rounded-r-2xl pr-0.5'
-  if (inRange) wrapClass += 'bg-blue-50/60'
-
-  let textClass = 'relative aspect-square flex flex-col items-center justify-center text-sm cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] '
-
-  if (isSelected) {
-    textClass += 'bg-blue-600 text-white font-medium rounded-2xl shadow-md shadow-blue-500/20 scale-105 z-10'
-  } else if (inRange) {
-    textClass += 'text-blue-800 font-medium'
+  if (selection) {
+    // Sheer glassy blue for active range
+    boxClasses += " bg-blue-500/15 ring-1 ring-blue-400 text-blue-700 dark:text-blue-300"
   } else {
-    textClass += 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 rounded-2xl'
+    // Subtle hover effect
+    boxClasses += " hover:bg-white/10 text-gray-600 dark:text-gray-300"
   }
 
   return (
-    <div className={wrapClass}>
-      <div className={textClass} onClick={onClick}>
-        <span>{day}</span>
-        {today && !isSelected && (
-          <div className="absolute bottom-1.5 w-1 h-1 bg-blue-500 rounded-full" />
-        )}
-      </div>
+    <div className={boxClasses} onClick={onClick}>
+      
+      <span>{day}</span>
+
+      {/* Blue dot for the current real-world date */}
+      {today && (
+        <div className="absolute bottom-1 w-1 h-1 bg-blue-400 rounded-full" />
+      )}
+
+      {/* Little dot if it's a designated holiday */}
+      {holiday && (
+        <span className={`w-1.5 h-1.5 rounded-full ml-1 shrink-0 ${holiday.color}`} />
+      )}
+
+      {/* hover tooltip for holiday info */}
+      {holiday && (
+        <div className="absolute bottom-full mb-1 hidden group-hover:block w-max max-w-[120px] bg-black text-white text-[10px] px-2 py-1 rounded z-50 shadow-md">
+          {holiday.icon} {holiday.name}
+        </div>
+      )}
+
     </div>
   )
 }
