@@ -1,44 +1,57 @@
 'use client'
 
+/**
+ * Individual day cell for the calendar grid.
+ * Handles today's highlight, selection state, and holiday markers.
+ */
 export default function DayCell({ day, selection, onClick, holiday, today, isDark }) {
   
   if (!day) {
+    // Empty slot for days from previous/next month in the grid
     return <div className="aspect-square" />
   }
 
-  // Refined clean state
-  let containerClasses = "rounded-lg flex items-center justify-center text-sm text-gray-300 hover:bg-gray-800 hover:scale-105 hover:shadow-lg transition-all cursor-pointer aspect-square"
+  // Base styles for a normal day
+  let classes = "relative group rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer aspect-square text-sm "
 
   if (selection) {
-    // Solid blue high-visibility selection
-    containerClasses = "rounded-lg flex items-center justify-center text-sm bg-blue-600 text-white font-medium shadow-lg shadow-blue-500/20 active:scale-95 transition cursor-pointer aspect-square z-10 scale-105"
-  } else if (today) {
-    // Distinct 'Today' highlight
-    containerClasses += " ring-2 ring-blue-500/50 dark:ring-blue-400/30 text-blue-500 dark:text-blue-400 font-bold"
+    // When the user has clicked/highlighted this day
+    classes += "bg-blue-600 text-white font-medium shadow-md z-10 scale-105"
+  } else {
+    // Default look
+    classes += "text-gray-300 hover:bg-gray-800/40 hover:scale-105"
+    if (today) {
+      // Special ring for the current day
+      classes += " ring-2 ring-blue-500/40 text-blue-400 font-bold"
+    }
   }
 
   return (
-    <div className={containerClasses} onClick={onClick}>
+    <div className={classes} onClick={onClick}>
       
-      <span>{day}</span>
+      <span className="z-10">{day}</span>
 
-      {/* Today indicator dot */}
+      {/* Blue dot at the bottom if it's today */}
       {today && (
-        <div className="absolute bottom-1 w-1 h-1 bg-blue-400 rounded-full" />
+        <div className="absolute bottom-2 w-1.5 h-1.5 bg-blue-400 rounded-full" />
       )}
 
-      {/* Holiday Indicator */}
+      {/* Small pulsing dot in the corner for holidays */}
       {holiday && (
-        <span className={`w-1.5 h-1.5 rounded-full ml-1 shrink-0 ${holiday.color} opacity-80`} />
+        <div className={`absolute top-1 right-1 w-2 h-2 rounded-full ${holiday.color} animate-pulse`} />
       )}
 
-      {/* Holiday Tooltip */}
+      {/* Show holiday name on hover */}
       {holiday && (
-        <div className="absolute bottom-full mb-1 hidden group-hover:block w-max max-w-[140px] bg-gray-900 text-white text-[10px] px-2 py-1.5 rounded-md z-50 shadow-xl border border-gray-800">
-          {holiday.icon} {holiday.name}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-black/90 text-white text-[10px] px-2 py-1 rounded-md z-50 whitespace-nowrap shadow-lg border border-white/10 flex items-center gap-1.5">
+          <span>{holiday.icon}</span>
+          <span className="font-semibold">{holiday.name}</span>
+          {/* Small triangle arrow at the bottom of tooltip */}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-x-[5px] border-x-transparent border-t-[5px] border-t-black/90" />
         </div>
       )}
 
     </div>
   )
 }
+

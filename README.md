@@ -1,47 +1,33 @@
-# Premium Dynamic Calendar Dashboard 📅
+# Calendar Application - Assignment Submission 📅
 
-This is a clean, production-ready calendar application built with **React (Next.js)** and **Tailwind CSS**. I focused on creating a balanced, high-end "Product" experience rather than just a basic grid. 
-
-The core idea was to blend beautiful monthly imagery with a sharp, high-contrast calendar interface that actually feels fast and tactile to use.
+This project is a React-based calendar dashboard built using **Next.js** and **Tailwind CSS**. I wanted to build something that feels more like a "real" product than just a basic calendar assignment, so I focused on a clean side-panel layout and smooth interactions.
 
 ---
 
-### Main Features I Built:
+### Key Features:
 
-✨ **Product-Level Layout (Side-Panel Design)**
-- Replaced the typical "full background" look with a dedicated Side-Panel for monthly images. This keeps the calendar dates and notes 100% readable while maintaining the monthly vibe on the left.
-- **Cinematic Visuals**: Added a 700ms zoom effect and a custom multi-stage gradient overlay (from-black/40) to the images for that premium gallery feel.
-
-🛡️ **Robust Date Logic & Range Selection**
-- Built a custom date-range selection engine. You can click a start date and an end date to instantly capture a period.
-- **Indian Holiday Integration**: Automatically flags major holidays (Republic Day, Holi, etc.) with custom icons and tooltips.
-- **Smart Today Marker**: Today’s date is automatically highlighted with a bold blue ring and a subtle dot indicator.
-
-📊 **Dynamic Selection Analytics (The Stats Tray)**
-- Added a live analytics line below the grid that calculates:
-    - **Total Duration**: The number of days in your selection.
-    - **Weekend Count**: Automatically flags Saturdays and Sundays for vacation/study planning.
-    - **Associated Notes**: Tells you how many schedules are already tied to that specific period.
-
-📝 **Advanced Schedule Management (Full CRUD)**
-- **Inline Modal-less Editing**: You can edit your notes directly inside the list without any annoying popups. The text field replaces the static text instantly when you click "Edit."
-- **Persistent Storage**: All notes and ranges are saved to `localStorage`, so your data stays right where you left it on refresh.
-
-🌘 **Automatic Adaptive Identity (Theme-Aware)**
-- The entire app automatically switches between a clean "Day Mode" and a professional "Night Mode" (bg-gray-900) based on your local system time.
+- **Side-Panel Dashboard**: Instead of a plain background, I used a side-panel for monthly images (from Unsplash) to give each month its own vibe without distracting from the actual dates.
+- **Date Range Selection**: You can select a single date or a range by clicking a start and end date. It's useful for blocking out periods for notes or tasks.
+- **Indian Holidays Integration**: I added a list of major Indian holidays for 2026. They show up with a small pulsing dot, and you can hover over them to see the name (like Republic Day or Diwali).
+- **Selection Analytics**: When you select a range, there's a small stats bar at the bottom that shows the total days, how many are weekends, and how many notes you've already added for that period.
+- **Note Management (CRUD)**: You can add, edit, and delete notes for any selected date/range. I made the editing inline so you don't have to deal with annoying popups.
+- **Auto Dark/Light Mode**: The app checks the time and switches themes automatically. After 6 PM, it goes into dark mode to be easier on the eyes.
 
 ---
 
-### UI & Micro-Interactions:
-I spent a lot of time on the "feel" of the app to make it stand out:
-- **Glassmorphism Accents**: All navigation and action buttons use a `bg-white/10 backdrop-blur` logic for that high-end Apple-style translucency.
-- **Tactile Grid**: Added `hover:scale-105` and `hover:shadow-lg` animations to every day cell.
-- **Deep Depth**: Applied a massive custom shadow (`shadow-[0_10px_40px_rgba(0,0,0,0.3)]`) to the main container to give it a significant floating presence.
+### Tech Decisions I Made:
+
+- **Next.js App Router**: Used the latest Next.js structure because it's standard now and handles routing/loading pretty well.
+- **Custom Hook (`useNotes`)**: I moved all the note logic into a custom hook. It handles saving everything to `localStorage` so your data doesn't disappear when you refresh.
+- **Modular Components**: I split the UI into `DayCell`, `CalendarHeader`, and `NotesPanel`. It made it way easier to debug the grid logic separately from the note input logic.
+- **Tailwind for UI**: I used Tailwind because it allowed me to quickly tweak the spacing and add effects like the glassmorphism on the buttons.
+
+### How to Run:
+
+1. Install dependencies: `npm install`
+2. Start the dev server: `npm run dev`
+3. Open [http://localhost:3000](http://localhost:3000)
 
 ---
+*Self-note: Might need to add a manual toggle for dark mode in the next version if I have time.*
 
-### How I Built It:
-- **Core**: Next.js (App Router), React Hooks (`useState`, `useEffect`, `useMemo`).
-- **Styling**: Tailwind CSS with custom utility classes for shadows and gradients.
-- **Architecture**: Separated logic into modular components (`DayCell`, `CalendarHeader`, `NotesPanel`) to keep the code clean and maintainable.
-- **Authored By**: 100% human-crafted logic and styling decisions.
