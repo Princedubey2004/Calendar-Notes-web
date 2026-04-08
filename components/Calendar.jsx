@@ -34,13 +34,40 @@ const indianHolidays = {
   "12-25": { name: "Christmas", icon: "🎄", color: "bg-red-500" }
 }
 
+// Helper to calculate statistics for a specific range of days
+const getSelectionStats = (start, end, notes) => {
+  if (!start) return null
+
+  const s = start.getTime()
+  const e = (end || start).getTime()
+
+  let total = 0
+  let weekend = 0
+
+  // Iterate over duration and pluck stats
+  for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+    total++
+    const day = d.getDay()
+    if (day === 0 || day === 6) weekend++
+  }
+
+  // Check how many of our notes fall into this bucket
+  const noteCount = notes.filter(n => {
+    const ns = new Date(n.start).getTime()
+    const ne = new Date(n.end).getTime()
+    return Math.max(s, ns) <= Math.min(e, ne)
+  }).length
+
+  return { total, weekend, noteCount }
+}
+
 export default function Calendar() {
   const [viewDate, setViewDate] = useState(new Date())
   const [rangeStart, setRangeStart] = useState(null)
   const [rangeEnd, setRangeEnd] = useState(null)
   const [animating, setAnimating] = useState(false)
 
-  const { notes, addNote, deleteNote, clearNotes } = useNotes()
+  const { notes, addNote, deleteNote, clearNotes, editNote } = useNotes()
 
   const currentYear = viewDate.getFullYear()
   const currentMonth = viewDate.getMonth()
@@ -88,6 +115,9 @@ export default function Calendar() {
     }
   }
 
+  // Calculate live stats for the current range selection
+  const stats = getSelectionStats(rangeStart, rangeEnd, notes)
+
   const checkHighlight = (day) => {
     if (!day) return false
     const d = new Date(currentYear, currentMonth, day)
@@ -121,55 +151,63 @@ export default function Calendar() {
   const matchesCurrent = todayObj.getFullYear() === currentYear && todayObj.getMonth() === currentMonth
   const realTodayDate = todayObj.getDate()
 
+  // Monthly vibe image selected from our preset map
   const headerPic = monthPictures[currentMonth] || monthPictures[0]
 
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 min-h-[600px] flex flex-col">
+    <div className={`flex flex-col lg:flex-row rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 transition-all duration-300 ${darkTheme ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
 
-      {/* FULL BACKGROUND IMAGE CAROUSEL */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      {/* SIDE PANEL: Cinematic Monthly Visual */}
+      <div className="h-48 lg:h-auto lg:w-[35%] xl:w-[30%] shrink-0 relative overflow-hidden group">
         <img 
-          src={`${headerPic}?auto=format&fit=crop&w=1200&q=80`} 
-          className="w-full h-full object-cover transition-transform duration-[3000ms] hover:scale-110 scale-105" 
-          alt="background"
+          src={`${headerPic}?auto=format&fit=crop&w=800&q=80`} 
+          className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
+          alt="monthly vibe"
         />
-        {/* Multi-layer readability overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/30 to-black/60 backdrop-blur-[1px]"/>
+        {/* Multistage gradient for extra depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"/>
       </div>
 
-      {/* INTERACTIVE CONTENT LAYER */}
-      <div className={`relative z-10 p-4 sm:p-6 flex-1 flex flex-col transition-all duration-500 ease-in-out ${animating ? 'opacity-30 scale-98 blur-md pointer-events-none' : 'opacity-100 scale-100 blur-0'}`}>
+      {/* MAIN CONTENT: Calendar & Interaction Section */}
+      <div className={`p-4 sm:p-6 lg:p-8 flex-1 flex flex-col relative transition-all duration-300 ${animating ? 'opacity-30 blur-[1px] pointer-events-none' : 'opacity-100'}`}>
         
-        {/* Subtle switch overlay */}
-        {animating && (
-          <div className="absolute inset-0 z-20 bg-white/5 backdrop-blur-[2px] rounded-2xl"/>
-        )}
+        {/* Transition blocker (prevents double-clicks during month switch) */}
+        {animating && <div className="absolute inset-0 z-20 cursor-wait"/>}
 
-        <CalendarHeader currentDate={viewDate} onPrev={movePrev} onNext={moveNext} />
+        <CalendarHeader 
+          currentDate={viewDate} 
+          onPrev={movePrev} 
+          onNext={moveNext} 
+          isDark={darkTheme}
+        />
 
-        {/* Floating Quick Actions */}
-        <div className="flex justify-between mb-4">
+        {/* Action Toolbar */}
+        <div className="flex justify-between mb-6">
           <button 
             onClick={() => setViewDate(new Date())} 
-            className="px-4 py-1.5 text-xs bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-lg backdrop-blur-md transition-all font-medium"
+            className="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md hover:bg-white/20 transition text-xs text-white border border-white/5"
           >
             Today
           </button>
           <button 
             onClick={wipeMonthData} 
-            className="px-4 py-1.5 text-xs bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white rounded-lg backdrop-blur-md transition-all font-medium"
+            className="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md hover:bg-white/20 transition text-xs text-white border border-white/5"
           >
             Clear Month
           </button>
         </div>
 
-        {/* Week Day Labels */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-[10px] sm:text-xs mb-3 text-white/60 font-bold uppercase tracking-widest text-center">
-          {DAYS.map(dayName => <div key={dayName} className="drop-shadow-sm">{dayName}</div>)}
+        {/* Day Headings */}
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-4">
+          {DAYS.map(day => (
+            <div key={day} className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 font-bold text-center uppercase tracking-widest px-1">
+              {day}
+            </div>
+          ))}
         </div>
 
-        {/* The Glass Grid */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2">
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 grow">
           {calendarDays.map((day, idx) => (
             <DayCell
               key={idx}
@@ -178,13 +216,23 @@ export default function Calendar() {
               selection={checkHighlight(day)}
               holiday={indianHolidays[`${currentMonth + 1}-${day}`]}
               onClick={() => selectDate(day)}
+              isDark={darkTheme}
             />
           ))}
         </div>
 
-        {/* Status Line */}
-        <div className="text-[10px] sm:text-xs mt-4 text-white/50 italic font-medium tracking-wide drop-shadow-sm">
-          {rangeStart && `Schedule: ${rangeStart.toLocaleDateString()} ${rangeEnd ? ' → '+rangeEnd.toLocaleDateString() : ''}`}
+        {/* Dynamic Analytics Tray */}
+        {stats && (
+          <div className="mt-4 flex gap-4 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+            <span>Selected: <span className="text-blue-500">{stats.total} days</span></span>
+            <span>Weekend: <span className="text-blue-500">{stats.weekend}</span></span>
+            <span>Notes: <span className="text-blue-500">{stats.noteCount}</span></span>
+          </div>
+        )}
+
+        {/* Selected Date Context */}
+        <div className="text-[10px] sm:text-xs mt-6 text-gray-400 dark:text-gray-500 font-medium">
+          {rangeStart && `SCHEDULED: ${rangeStart.toLocaleDateString()} ${rangeEnd ? ' → '+rangeEnd.toLocaleDateString() : ''}`}
         </div>
 
         <NotesPanel
@@ -196,14 +244,15 @@ export default function Calendar() {
           })}
           onAddNote={addNote}
           onDeleteNote={deleteNote}
+          onEditNote={editNote}
+          isDark={darkTheme}
         />
 
       </div>
 
-      {/* Image Preloader */}
       <div className="hidden">
         {Object.values(monthPictures).map((src, idx) => (
-          <img key={idx} src={`${src}?auto=format&fit=crop&w=1200&q=80`} alt="" />
+          <img key={idx} src={`${src}?auto=format&fit=crop&w=800&q=80`} alt="" />
         ))}
       </div>
     </div>

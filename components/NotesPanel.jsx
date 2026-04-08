@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 
-export default function NotesPanel({ rangeStart, rangeEnd, notes, onAddNote, onDeleteNote }) {
+export default function NotesPanel({ rangeStart, rangeEnd, notes, onAddNote, onDeleteNote, isDark, onEditNote }) {
   const [inputText, setInputText] = useState('')
+  const [editingId, setEditingId] = useState(null)
+  const [editText, setEditText] = useState('')
 
   const handlePostNote = (e) => {
     e.preventDefault()
-    
-    // Validate we have text and a date context
     if (!inputText.trim() || !rangeStart) return
 
     onAddNote({
@@ -16,63 +16,98 @@ export default function NotesPanel({ rangeStart, rangeEnd, notes, onAddNote, onD
       start: rangeStart.toISOString(),
       end: (rangeEnd || rangeStart).toISOString()
     })
-
     setInputText('')
   }
 
-  return (
-    <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-3 flex flex-col flex-1 min-h-0">
+  const formatDateLabel = (start, end) => {
+    const s = new Date(start)
+    const e = new Date(end)
+    const month = s.toLocaleDateString(undefined, { month: 'short' })
+    return s.getTime() === e.getTime() 
+      ? `${s.getDate()} ${month}`
+      : `${s.getDate()}-${e.getDate()} ${month}`
+  }
 
-      {/* Entry form */}
-      <form onSubmit={handlePostNote} className="flex gap-2 mb-3 shrink-0">
+  return (
+    <div className="mt-8 border-t border-gray-100 dark:border-gray-800 pt-6 flex flex-col gap-4">
+
+      {/* Input Form */}
+      <form onSubmit={handlePostNote} className="flex gap-2 shrink-0">
         <input
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          className="flex-1 bg-gray-800 border border-gray-700 text-white placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-          placeholder="New note..."
+          className={`flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${
+            isDark ? 'bg-gray-800 text-white placeholder-gray-500' : 'bg-gray-50 text-gray-900 placeholder-gray-400'
+          }`}
+          placeholder="Type a note and press Add..."
         />
-        <button className="bg-blue-500 hover:bg-blue-600 transition text-white px-3 py-1 text-sm rounded-lg font-medium">
+        <button className="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-5 py-2 text-sm rounded-xl font-bold transition-all">
           Add
         </button>
       </form>
 
-      {/* List of active month notes */}
-      <ul className="max-h-40 overflow-y-auto space-y-2 pr-1">
+      {/* Notes List */}
+      <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
         {notes.length === 0 ? (
-          <p className="text-xs text-gray-400 italic">No notes for this month.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 italic text-center py-4">No notes scheduled for this month.</p>
         ) : (
-          notes.map(note => {
-            const s = new Date(note.start)
-            const e = new Date(note.end)
-            const isRange = s.getTime() !== e.getTime()
-            const dateStr = isRange 
-              ? `${s.getDate()} - ${e.getDate()} ${s.toLocaleDateString(undefined, { month: 'short' })}`
-              : `${s.getDate()} ${s.toLocaleDateString(undefined, { month: 'short' })}`
-
-            return (
-              <li 
-                key={note.id} 
-                className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm transition-all duration-300 hover:border-blue-500/30 group/note animate-in slide-in-from-top-2 fade-in"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] text-blue-400 font-bold uppercase tracking-wide opacity-80 group-hover/note:opacity-100 transition-opacity">
-                    {dateStr}
-                  </span>
-                  <span className="break-all text-sm text-white/90 leading-relaxed font-medium">
+          notes.map(note => (
+            <div 
+              key={note.id} 
+              className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white flex justify-between items-start gap-4 transition-all hover:scale-[1.01] transition-transform"
+            >
+              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400">
+                  {formatDateLabel(note.start, note.end)}
+                </span>
+                
+                {editingId === note.id ? (
+                  <input
+                    value={editText}
+                    onChange={e => setEditText(e.target.value)}
+                    className="w-full bg-gray-700 text-white px-2 py-1 rounded outline-none border border-blue-500/50"
+                    autoFocus
+                  />
+                ) : (
+                  <p className="leading-relaxed break-keep truncate sm:whitespace-normal">
                     {note.text}
-                  </span>
-                </div>
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-2 shrink-0 pt-0.5">
+                {editingId === note.id ? (
+                  <button
+                    onClick={() => {
+                      onEditNote(note.id, editText)
+                      setEditingId(null)
+                    }}
+                    className="text-[10px] uppercase font-bold text-green-400 hover:text-green-300 transition"
+                  >
+                    Save
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEditingId(note.id)
+                      setEditText(note.text)
+                    }}
+                    className="text-[10px] uppercase font-bold text-blue-400 hover:text-blue-300 transition"
+                  >
+                    Edit
+                  </button>
+                )}
                 <button 
                   onClick={() => onDeleteNote(note.id)} 
-                  className="text-gray-500 hover:text-red-400 transition-colors duration-200 text-sm px-1.5 active:scale-90"
+                  className="text-[10px] uppercase font-bold text-red-500 hover:text-red-400 transition"
                 >
-                  ✕
+                  Delete
                 </button>
-              </li>
-            )
-          })
+              </div>
+            </div>
+          ))
         )}
-      </ul>
+      </div>
 
     </div>
   )

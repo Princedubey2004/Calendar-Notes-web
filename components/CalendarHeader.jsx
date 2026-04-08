@@ -1,16 +1,26 @@
 'use client'
 
-export default function CalendarHeader({ currentDate, onPrev, onNext }) {
+export default function CalendarHeader({ currentDate, onPrev, onNext, isDark }) {
   return (
-    <div className="flex justify-between items-center mb-3">
+    <div className="flex justify-between items-center mb-6">
       
-      <h2 className="text-xl font-bold text-white drop-shadow-md">
-        {currentDate.toLocaleString("default",{month:"long",year:"numeric"})}
+      <h2 className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
       </h2>
 
       <div className="flex gap-2">
-        <button onClick={onPrev} className="p-2 sm:px-3 sm:py-2 bg-white/10 hover:bg-white/20 active:scale-90 border border-white/20 text-white rounded-lg transition-all duration-200">←</button>
-        <button onClick={onNext} className="p-2 sm:px-3 sm:py-2 bg-white/10 hover:bg-white/20 active:scale-90 border border-white/20 text-white rounded-lg transition-all duration-200">→</button>
+        <button 
+          onClick={onPrev} 
+          className="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur hover:bg-white/20 transition text-xs text-white"
+        >
+          ←
+        </button>
+        <button 
+          onClick={onNext} 
+          className="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur hover:bg-white/20 transition text-xs text-white"
+        >
+          →
+        </button>
       </div>
     </div>
   )

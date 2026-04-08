@@ -46,5 +46,13 @@ export const useNotes = () => {
     })
   }
 
-  return { notes, addNote, deleteNote, clearNotes }
+  const editNote = (id, newText) => {
+    setNotes(prev => {
+      const updated = prev.map(n => n.id === id ? { ...n, text: newText } : n)
+      localStorage.setItem('calendar_notes', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  return { notes, addNote, deleteNote, clearNotes, editNote }
 }

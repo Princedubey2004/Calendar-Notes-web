@@ -1,42 +1,40 @@
 'use client'
 
-// Individual box for each day in the month
-export default function DayCell({ day, selection, onClick, holiday, today }) {
+export default function DayCell({ day, selection, onClick, holiday, today, isDark }) {
   
-  // Return empty div if it's just padding for start of month
   if (!day) {
     return <div className="aspect-square" />
   }
 
-  // Glassmorphism classes based on state
-  let boxClasses = "aspect-square flex items-center justify-center text-xs sm:text-sm rounded-lg cursor-pointer relative group transition-all duration-200 hover:scale-110 active:scale-90 z-0 hover:z-10 backdrop-blur-sm shadow-sm"
+  // Refined clean state
+  let containerClasses = "rounded-lg flex items-center justify-center text-sm text-gray-300 hover:bg-gray-800 hover:scale-105 hover:shadow-lg transition-all cursor-pointer aspect-square"
 
   if (selection) {
-    // High-visibility 'solid' glass highlight for selection
-    boxClasses += " bg-white/30 ring-2 ring-white/40 text-white shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-  } else {
-    // Subtle frosted glass for unselected cells
-    boxClasses += " bg-black/10 dark:bg-white/5 hover:bg-white/15 text-white font-medium drop-shadow-sm"
+    // Solid blue high-visibility selection
+    containerClasses = "rounded-lg flex items-center justify-center text-sm bg-blue-600 text-white font-medium shadow-lg shadow-blue-500/20 active:scale-95 transition cursor-pointer aspect-square z-10 scale-105"
+  } else if (today) {
+    // Distinct 'Today' highlight
+    containerClasses += " ring-2 ring-blue-500/50 dark:ring-blue-400/30 text-blue-500 dark:text-blue-400 font-bold"
   }
 
   return (
-    <div className={boxClasses} onClick={onClick}>
+    <div className={containerClasses} onClick={onClick}>
       
-      <span className="drop-shadow-md">{day}</span>
+      <span>{day}</span>
 
-      {/* Blue dot today indicator with pulse and glow */}
+      {/* Today indicator dot */}
       {today && (
-        <div className="absolute bottom-1.5 w-1 h-1 bg-blue-300 rounded-full animate-pulse shadow-[0_0_10px_rgba(147,197,253,1)]" />
+        <div className="absolute bottom-1 w-1 h-1 bg-blue-400 rounded-full" />
       )}
 
-      {/* Little dot if it's a designated holiday */}
+      {/* Holiday Indicator */}
       {holiday && (
-        <span className={`w-1.5 h-1.5 rounded-full ml-1 shrink-0 ${holiday.color}`} />
+        <span className={`w-1.5 h-1.5 rounded-full ml-1 shrink-0 ${holiday.color} opacity-80`} />
       )}
 
-      {/* hover tooltip for holiday info */}
+      {/* Holiday Tooltip */}
       {holiday && (
-        <div className="absolute bottom-full mb-1 hidden group-hover:block w-max max-w-[120px] bg-black text-white text-[10px] px-2 py-1 rounded z-50 shadow-md">
+        <div className="absolute bottom-full mb-1 hidden group-hover:block w-max max-w-[140px] bg-gray-900 text-white text-[10px] px-2 py-1.5 rounded-md z-50 shadow-xl border border-gray-800">
           {holiday.icon} {holiday.name}
         </div>
       )}
